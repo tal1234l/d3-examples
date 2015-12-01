@@ -10,13 +10,13 @@ angular.module('portfolioApp')
 
     var data = $scope.data;
     /* instantiate and configure map */
-    var map = L.map('map');
+
     var breweryMarkers = new L.FeatureGroup();
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      id: 'austinlyons.mp2nb11m',
-      accessToken: 'pk.eyJ1IjoiYXVzdGlubHlvbnMiLCJhIjoiOWJhYzFiMTI2MGI1MTFhYWMyYTJmNGFlZGMwMjMyNjgifQ.n2zowhjxnTJmttve5ClAJg',
-      maxZoom: 16
-    } ).addTo(map);
+    // Provide your access token
+    L.mapbox.accessToken = 'pk.eyJ1IjoidGFsMTIzNGwiLCJhIjoiY2lobjNkc2I4MDBnMXU5bTRhOWF1bHBhYyJ9.Cx0CACAXVQLDlPdP6DBRog';
+    // Create a map in the div #map
+    L.mapbox.map('map', 'tal1234l.oac1h7ja');
+
     /* Parse JSON file, create charts, draw markers on map */
     d3.json('data.json', function (error, data) {
       var beerData = data.response.beers.items;
@@ -113,7 +113,7 @@ angular.module('portfolioApp')
         .x(d3.scale.linear().domain([0,5.2]))
         .elasticY(true)
         .centerBar(true)
-        .gap(5)
+        .barPadding(5)
         .xAxisLabel('My rating')
         .yAxisLabel('Count')
         .margins({top: 10, right: 20, bottom: 50, left: 50});
@@ -126,7 +126,7 @@ angular.module('portfolioApp')
         .x(d3.scale.linear().domain([0,5.2]))
         .elasticY(true)
         .centerBar(true)
-        .gap(5)
+        .barPadding(5)
         .xAxisLabel('Community rating')
         .yAxisLabel('Count')
         .margins({top: 10, right: 20, bottom: 50, left: 50});
@@ -139,7 +139,7 @@ angular.module('portfolioApp')
         .x(d3.scale.linear().domain([-0.2, d3.max(beerData, function (d) { return d.beer.beer_abv; }) + 0.2]))
         .elasticY(true)
         .centerBar(true)
-        .gap(2)
+        .barPadding(2)
         .xAxisLabel('Alcohol By Volume (%)')
         .yAxisLabel('Count')
         .margins({top: 10, right: 20, bottom: 50, left: 50});
@@ -151,7 +151,7 @@ angular.module('portfolioApp')
         .x(d3.scale.linear().domain([-2, d3.max(beerData, function (d) { return d.beer.beer_ibu; }) + 2]))
         .elasticY(true)
         .centerBar(true)
-        .gap(5)
+        .barPadding(3)
         .xAxisLabel('International Bitterness Units')
         .yAxisLabel('Count')
         .xUnits(function (d) { return 5;})
