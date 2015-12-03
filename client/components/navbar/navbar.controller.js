@@ -5,6 +5,10 @@ angular.module('portfolioApp')
     $scope.menu = [{
       'title': 'customers',
       'link': '/'
+    },
+    {
+      'title': 'poc',
+      'link': '/poc'
     }];
 
     $scope.isCollapsed = true;

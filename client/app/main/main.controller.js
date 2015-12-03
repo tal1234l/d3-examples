@@ -186,8 +186,8 @@ angular.module('portfolioApp')
             marker.bindPopup("<p>" + name + " " + loc.brewery_city + " " + loc.brewery_state + "</p>");
             breweryMarkers.addLayer(marker);
           });
-          map.addLayer(breweryMarkers);
-          map.fitBounds(breweryMarkers.getBounds());
+          //map.addLayer(breweryMarkers);
+          //map.fitBounds(breweryMarkers.getBounds());
         });
       // register handlers
       d3.selectAll('a#all').on('click', function () {
