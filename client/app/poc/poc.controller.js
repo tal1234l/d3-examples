@@ -93,6 +93,7 @@ angular.module('portfolioApp')
       .colors(["#FFC323"])
       .xAxisLabel('Time of day')
       .yAxisLabel('Transactions')
+      .renderHorizontalGridLines(true)
 
       .margins({top: 10, right: 20, bottom: 50, left: 50});
       //pocChart.xAxis().tickValues([0, 1, 2, 3, 4, 5]);
