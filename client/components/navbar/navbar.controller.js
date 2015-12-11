@@ -9,6 +9,10 @@ angular.module('portfolioApp')
     {
       'title': 'poc',
       'link': '/poc'
+    },
+    {
+      'title': 'revenue',
+      'link': '/revenue'
     }];
 
     $scope.isCollapsed = true;
