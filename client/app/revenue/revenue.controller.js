@@ -36,6 +36,17 @@ angular.module('portfolioApp')
         return d.Month;
       });
 
+      // get all branch id's
+      var allBranches = branch_Dim.group();
+      var branchIdArray = [];
+      allBranches.all().forEach(function(branchId) {
+        branchIdArray.push(""+branchId.key);
+        $("#select-dropDown").append('<option value=' + branchId.key + '>' + branchId.key + '</option>');
+      });
+
+      //TODO: show it in a dropdown for selection
+      //TODO: when a branch is selected, change the bars
+
       // groups
       var sum_revenue_appCard = Month_Dim.group().reduceSum(function(d) {
         return d.Total_Revenue_from_AppCard_Transactions;
@@ -77,25 +88,29 @@ angular.module('portfolioApp')
         return "$"+d;
       });
 
-      combined.compose([
-        // Revenue from non appcard users
-        dc.barChart(combined)
-          .colors("#FFC323")
-          .centerBar(true)
-          .barPadding(3)
-          .group(sum_revenue_non_appCard, "Non AppCard"),
+      // Revenue from non appcard users
+      var nonAppCardRev = dc.barChart(combined)
+        .colors("#FFC323")
+        .centerBar(true)
+        .barPadding(3)
+        .group(sum_revenue_non_appCard, "Non AppCard");
 
-        // Revenue from appcard users
-        dc.barChart(combined)
-          .colors("#9900ff")
-          .centerBar(true)
-          .barPadding(3)
-          .group(sum_revenue_appCard, "AppCard")
-      ]);
+      // Revenue from appcard users
+      var appCardRev = dc.barChart(combined)
+        .colors("#9900ff")
+        .centerBar(true)
+        .barPadding(3)
+        .group(sum_revenue_appCard, "AppCard");
 
-      //combined.render();
+      combined.compose([nonAppCardRev, appCardRev]);
+
+      d3.select('#select-dropDown').on('change', function(){
+        branch_Dim.filter(this.value) ;
+        dc.redrawAll();
+      });
 
       // showtime!
       dc.renderAll();
+
     });
   });
