@@ -18,8 +18,9 @@ angular.module('portfolioApp')
     d3.csv("sampledata.csv", type, function(data) {
       var ndx = crossfilter(data);
       var all = ndx.groupAll();
+      var entriesCount = all.reduceCount().value();
 
-      // dimenssion (x axis)
+      // dimensions (x axis)
       var appCardRevenue_Dim = ndx.dimension(function (d) {
         return d.Total_Revenue_from_AppCard_Transactions;
       });
@@ -44,9 +45,6 @@ angular.module('portfolioApp')
         $("#select-dropDown").append('<option value=' + branchId.key + '>' + branchId.key + '</option>');
       });
 
-      //TODO: show it in a dropdown for selection
-      //TODO: when a branch is selected, change the bars
-
       // groups
       var sum_revenue_appCard = Month_Dim.group().reduceSum(function(d) {
         return d.Total_Revenue_from_AppCard_Transactions;
@@ -65,11 +63,11 @@ angular.module('portfolioApp')
       maxDate.setMonth(maxDate.getMonth()+3);
 
       // create a composition chart
-      var combined = dc.compositeChart('#revenue-chart')
-        .width(1000)
+      var combined = dc.compositeChart('#revenue_chart')
+        .width(900)
         .height(480)
         .title(function(d) {return 'Date: ' + d.key.getMonth() + '/' + d.key.getFullYear() + '\nValue: ' + d.value.toFixed(2); })
-        .legend(dc.legend().x(850).y(420).gap(5))
+        .legend(dc.legend().x(750).y(420).gap(5))
         .brushOn(false)
         .elasticY(true)
         .dimension(Month_Dim)
@@ -104,8 +102,68 @@ angular.module('portfolioApp')
 
       combined.compose([nonAppCardRev, appCardRev]);
 
+      /* ---Pie Chart---- */
+      var PieChart =  function () {
+        this.getTotalAppCardRevenue = function () {
+          return Month_Dim.groupAll().reduceSum(function(d) {
+            return d.Total_Revenue_from_AppCard_Transactions;
+          }).value();
+        };
+
+        this.getTotalNonAppCradRevenue = function() {
+          return Month_Dim.groupAll().reduceSum(function(d) {
+            return d.Total_Revenue_from_Non_AppCard_Transactions;
+          }).value();
+        };
+
+        this.getTotalRevenue = function () {
+          return Month_Dim.groupAll().reduceSum(function(d) {
+            return d.Total_Revenue_from_Non_AppCard_Transactions + d.Total_Revenue_from_AppCard_Transactions;
+          }).value();
+        };
+
+        this.totalRev = this.getTotalRevenue();
+
+        this.revenue_Json = {
+          "items": [
+            {
+              "revenue": (this.getTotalAppCardRevenue() * 100 / this.totalRev).toFixed(2)
+            },
+            {
+              "revenue": (this.getTotalNonAppCradRevenue() * 100 / this.totalRev).toFixed(2)
+            }
+          ]
+        };
+
+        this.pie_ndx = crossfilter(this.revenue_Json.items);
+
+        this.pie_revenue_dim = this.pie_ndx.dimension(function (d) {
+          return d.revenue+"%";
+        });
+
+        this.pie_revenue_sum = this.pie_revenue_dim.group().reduceSum(function (d) {
+          return d.revenue;
+        });
+
+        this.revenuePie = dc.pieChart('#revenue_pie')
+          .width(350)
+          .height(350)
+          .colors(d3.scale.ordinal().range(["#9900ff", "#FFC323"]))
+          .dimension(this.pie_revenue_dim)
+          .group(this.pie_revenue_sum)
+          .innerRadius(20);
+
+        this.revenuePie.render();
+      };
+      /* ---------------- */
+
+      var pieRevenueChart = new PieChart();
+
+      // define the filer triggers
       d3.select('#select-dropDown').on('change', function(){
-        branch_Dim.filter(this.value) ;
+        branch_Dim.filter(this.value);
+        $('#revenue_pie').children().remove()
+        var pieRevenueChart = new PieChart();
         dc.redrawAll();
       });
 
