@@ -66,7 +66,7 @@ angular.module('portfolioApp')
       var combined = dc.compositeChart('#revenue_chart')
         .width(900)
         .height(480)
-        .title(function(d) {return 'Date: ' + d.key.getMonth() + '/' + d.key.getFullYear() + '\nValue: ' + d.value.toFixed(2); })
+        .title(function(d) {return 'Date: ' + (d.key.getMonth()+1) + '/' + d.key.getFullYear() + '\nValue: ' + d.value.toFixed(2); })
         .legend(dc.legend().x(750).y(420).gap(5))
         .brushOn(false)
         .elasticY(true)
@@ -80,7 +80,7 @@ angular.module('portfolioApp')
         .margins({top: 10, right: 20, bottom: 100, left: 80});
 
       combined.xAxis().tickFormat(function (d) {
-        return d.getMonth() + "/" + d.getFullYear();
+        return (d.getMonth()+1) + "/" + d.getFullYear();
       });
       combined.yAxis().tickFormat(function(d, i){
         return "$"+d;
@@ -127,10 +127,12 @@ angular.module('portfolioApp')
         this.revenue_Json = {
           "items": [
             {
-              "revenue": (this.getTotalAppCardRevenue() * 100 / this.totalRev).toFixed(2)
+              "revenue": (this.getTotalAppCardRevenue() * 100 / this.totalRev).toFixed(2),
+              "type": "AppCard Member"
             },
             {
-              "revenue": (this.getTotalNonAppCradRevenue() * 100 / this.totalRev).toFixed(2)
+              "revenue": (this.getTotalNonAppCradRevenue() * 100 / this.totalRev).toFixed(2),
+              "type": "Regular Shopper"
             }
           ]
         };
@@ -138,7 +140,7 @@ angular.module('portfolioApp')
         this.pie_ndx = crossfilter(this.revenue_Json.items);
 
         this.pie_revenue_dim = this.pie_ndx.dimension(function (d) {
-          return d.revenue+"%";
+          return d.type;
         });
 
         this.pie_revenue_sum = this.pie_revenue_dim.group().reduceSum(function (d) {
@@ -148,7 +150,9 @@ angular.module('portfolioApp')
         this.revenuePie = dc.pieChart('#revenue_pie')
           .width(350)
           .height(350)
+          .title(function(d) { return d.key + ": " + d.value; })
           .colors(d3.scale.ordinal().range(["#9900ff", "#FFC323"]))
+          .label(function(d) { return d.value + "%"; })
           .dimension(this.pie_revenue_dim)
           .group(this.pie_revenue_sum)
           .innerRadius(20);
